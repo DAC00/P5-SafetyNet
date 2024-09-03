@@ -1,6 +1,8 @@
 package com.opcr.safetynet_alert.model;
 
 import java.util.List;
+import java.util.Objects;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -78,5 +80,12 @@ public class MedicalRecord {
     @JsonProperty("firstName")
     public void setFirstName(String firstName) {
         this.firstName = firstName;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof MedicalRecord that)) return false;
+        return Objects.equals(firstName, that.firstName) && Objects.equals(lastName, that.lastName);
     }
 }

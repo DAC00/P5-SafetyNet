@@ -20,6 +20,10 @@ public class JsonDataUtils {
     public JsonDataUtils(){
         this.jsonData = null;
         getDataFromJSON();
+
+        System.out.println("Persons : " + jsonData.getPersons().size());
+        System.out.println("Stations : " + jsonData.getFireStations().size());
+        System.out.println("MedicalRecords : " + jsonData.getMedicalRecords().size());
     }
 
     private void getDataFromJSON(){
@@ -41,18 +45,20 @@ public class JsonDataUtils {
         }
     }
 
+    public void updatePersons(ArrayList<Person> persons){
+
+    }
+
     public void updateFireStations(ArrayList<FireStation> fireStations){
         JsonData jsonDataUpdated = jsonData;
         jsonDataUpdated.setFireStations(fireStations);
         updateJsonData(jsonDataUpdated);
     }
 
-    public void updatePersons(ArrayList<Person> persons){
-
-    }
-
     public void updateMedicalRecords(ArrayList<MedicalRecord> medicalRecords){
-
+        JsonData jsonDataUpdated = jsonData;
+        jsonDataUpdated.setMedicalRecords(medicalRecords);
+        updateJsonData(jsonDataUpdated);
     }
 
     public ArrayList<Person> getPersons(){
