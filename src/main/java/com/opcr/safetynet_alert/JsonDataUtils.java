@@ -46,7 +46,9 @@ public class JsonDataUtils {
     }
 
     public void updatePersons(ArrayList<Person> persons){
-
+        JsonData jsonDataUpdated = jsonData;
+        jsonDataUpdated.setPersons(persons);
+        updateJsonData(jsonDataUpdated);
     }
 
     public void updateFireStations(ArrayList<FireStation> fireStations){
