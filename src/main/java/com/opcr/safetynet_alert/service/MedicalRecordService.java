@@ -1,7 +1,6 @@
 package com.opcr.safetynet_alert.service;
 
 import com.opcr.safetynet_alert.JsonDataUtils;
-import com.opcr.safetynet_alert.model.FireStation;
 import com.opcr.safetynet_alert.model.MedicalRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

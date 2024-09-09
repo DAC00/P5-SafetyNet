@@ -19,22 +19,18 @@ public class FireStation {
     @JsonProperty("station")
     private int station;
 
-    @JsonProperty("station")
     public int getStation() {
         return station;
     }
 
-    @JsonProperty("station")
     public void setStation(int station) {
         this.station = station;
     }
 
-    @JsonProperty("address")
     public String getAddress() {
         return address;
     }
 
-    @JsonProperty("address")
     public void setAddress(String address) {
         this.address = address;
     }

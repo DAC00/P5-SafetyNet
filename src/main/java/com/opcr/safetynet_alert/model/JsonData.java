@@ -23,32 +23,26 @@ public class JsonData {
     @JsonProperty("medicalrecords")
     private ArrayList<MedicalRecord> medicalRecords;
 
-    @JsonProperty("medicalrecords")
     public ArrayList<MedicalRecord> getMedicalRecords() {
         return medicalRecords;
     }
 
-    @JsonProperty("medicalrecords")
     public void setMedicalRecords(ArrayList<MedicalRecord> medicalRecords) {
         this.medicalRecords = medicalRecords;
     }
 
-    @JsonProperty("firestations")
     public ArrayList<FireStation> getFireStations() {
         return fireStations;
     }
 
-    @JsonProperty("firestations")
     public void setFireStations(ArrayList<FireStation> fireStations) {
         this.fireStations = fireStations;
     }
 
-    @JsonProperty("persons")
     public ArrayList<Person> getPersons() {
         return persons;
     }
 
-    @JsonProperty("persons")
     public void setPersons(ArrayList<Person> persons) {
         this.persons = persons;
     }

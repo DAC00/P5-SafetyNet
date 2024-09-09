@@ -1,5 +1,10 @@
 package com.opcr.safetynet_alert.model;
 
+import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 
@@ -37,47 +42,38 @@ public class MedicalRecord {
         return allergies;
     }
 
-    @JsonProperty("allergies")
     public void setAllergies(List<String> allergies) {
         this.allergies = allergies;
     }
 
-    @JsonProperty("medications")
     public List<String> getMedications() {
         return medications;
     }
 
-    @JsonProperty("medications")
     public void setMedications(List<String> medications) {
         this.medications = medications;
     }
 
-    @JsonProperty("birthdate")
     public String getBirthdate() {
         return birthdate;
     }
 
-    @JsonProperty("birthdate")
     public void setBirthdate(String birthdate) {
         this.birthdate = birthdate;
     }
 
-    @JsonProperty("lastName")
     public String getLastName() {
         return lastName;
     }
 
-    @JsonProperty("lastName")
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
 
-    @JsonProperty("firstName")
     public String getFirstName() {
         return firstName;
     }
 
-    @JsonProperty("firstName")
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
@@ -87,5 +83,10 @@ public class MedicalRecord {
         if (this == o) return true;
         if (!(o instanceof MedicalRecord that)) return false;
         return Objects.equals(firstName, that.firstName) && Objects.equals(lastName, that.lastName);
+    }
+
+    public int getAge(){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+        return Period.between(LocalDate.parse(this.birthdate,formatter), LocalDate.now()).getYears();
     }
 }
