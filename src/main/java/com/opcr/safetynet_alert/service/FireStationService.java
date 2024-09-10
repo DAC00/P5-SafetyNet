@@ -13,37 +13,37 @@ public class FireStationService {
     @Autowired
     private JsonDataUtils jsonDataUtils;
 
-    public void addFireStation(FireStation fireStation){
+    public boolean addFireStation(FireStation fireStation){
         ArrayList<FireStation> fireStations = jsonDataUtils.getFireStations();
         if(!fireStations.contains(fireStation)){
             fireStations.add(fireStation);
             jsonDataUtils.updateFireStations(fireStations);
-            System.out.println(fireStation.toString() + " : Added");
+            return true;
         }else {
-            System.out.println(fireStation.toString() + " : Already existing");
+            return false;
         }
     }
 
-    public void deleteFireStation(FireStation fireStation){
+    public boolean deleteFireStation(FireStation fireStation){
         ArrayList<FireStation> fireStations = jsonDataUtils.getFireStations();
         if(fireStations.contains(fireStation)){
             fireStations.remove(fireStation);
             jsonDataUtils.updateFireStations(fireStations);
-            System.out.println(fireStation.toString() + " : Deleted");
+            return true;
         }else {
-            System.out.println(fireStation.toString() + " : Not existing");
+            return false;
         }
     }
 
-    public void updateFireStation(FireStation fireStation){
+    public boolean updateFireStation(FireStation fireStation){
         ArrayList<FireStation> fireStations = jsonDataUtils.getFireStations();
         for(FireStation f : fireStations){
             if (f.getAddress().equals(fireStation.getAddress())){
                 f.setStation(fireStation.getStation());
                 jsonDataUtils.updateFireStations(fireStations);
-                System.out.println(fireStation.toString() + " : Updated");
-                break;
+                return true;
             }
         }
+        return false;
     }
 }
