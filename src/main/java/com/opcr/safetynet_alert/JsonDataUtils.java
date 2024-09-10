@@ -5,7 +5,12 @@ import com.opcr.safetynet_alert.model.FireStation;
 import com.opcr.safetynet_alert.model.JsonData;
 import com.opcr.safetynet_alert.model.MedicalRecord;
 import com.opcr.safetynet_alert.model.Person;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
+
 
 import java.io.File;
 import java.io.IOException;
@@ -14,23 +19,29 @@ import java.util.ArrayList;
 @Component
 public class JsonDataUtils {
 
-    private final String pathJSON = "src/main/resources/data.json";
+    private static final Logger logger = LogManager.getLogger(JsonDataUtils.class);
+    private final String filePath;
     private JsonData jsonData;
 
-    public JsonDataUtils(){
+    @Autowired
+    public JsonDataUtils(Environment environment){
+        this.filePath = environment.getProperty("json.filepath");
         this.jsonData = null;
+
         getDataFromJSON();
 
-        System.out.println("Persons : " + jsonData.getPersons().size());
-        System.out.println("Stations : " + jsonData.getFireStations().size());
-        System.out.println("MedicalRecords : " + jsonData.getMedicalRecords().size());
+        logger.info("Persons : {}.",jsonData.getPersons().size());
+        logger.info("Stations : {}.",jsonData.getFireStations().size());
+        logger.info("MedicalRecords : {}.",jsonData.getMedicalRecords().size());
     }
 
     private void getDataFromJSON(){
         try {
             ObjectMapper mapper = new ObjectMapper();
-            jsonData = mapper.readValue(new File(pathJSON), JsonData.class);
+            jsonData = mapper.readValue(new File(filePath), JsonData.class);
+            logger.info("Data loaded from : {}",filePath);
         } catch (IOException e) {
+            logger.error(e.getMessage());
             throw new RuntimeException(e);
         }
     }
@@ -38,9 +49,10 @@ public class JsonDataUtils {
     private void updateJsonData(JsonData jsonDataToDate){
         try {
             ObjectMapper mapper = new ObjectMapper();
-            mapper.writerWithDefaultPrettyPrinter().writeValue(new File(pathJSON),jsonDataToDate);
-            System.out.println(pathJSON + " : Updated");
+            mapper.writerWithDefaultPrettyPrinter().writeValue(new File(filePath),jsonDataToDate);
+            logger.info("Data updated : {}",filePath);
         } catch (IOException e) {
+            logger.error(e.getMessage());
             throw new RuntimeException(e);
         }
     }
