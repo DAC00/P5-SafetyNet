@@ -1,10 +1,5 @@
 package com.opcr.safetynet_alert.model;
 
-import java.text.SimpleDateFormat;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.Period;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 
@@ -83,10 +78,5 @@ public class MedicalRecord {
         if (this == o) return true;
         if (!(o instanceof MedicalRecord that)) return false;
         return Objects.equals(firstName, that.firstName) && Objects.equals(lastName, that.lastName);
-    }
-
-    public int getAge(){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
-        return Period.between(LocalDate.parse(this.birthdate,formatter), LocalDate.now()).getYears();
     }
 }

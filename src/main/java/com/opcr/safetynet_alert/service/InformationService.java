@@ -10,6 +10,9 @@ import com.opcr.safetynet_alert.model.Person;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 @Service
@@ -34,7 +37,7 @@ public class InformationService {
                 personNode.put("phone", p.getPhone());
                 for (MedicalRecord mr : jsonDataUtils.getMedicalRecords().stream().filter(mr -> mr.getFirstName().equals(p.getFirstName())
                         && mr.getLastName().equals(p.getLastName())).toList()) {
-                    if (mr.getAge() >= 18) {
+                    if (getAgeFromMedicalRecord(mr.getBirthdate()) >= 18) {
                         adults++;
                     } else {
                         children++;
@@ -61,10 +64,10 @@ public class InformationService {
             MedicalRecord medRecFind = jsonDataUtils.getMedicalRecords().stream().filter(medicalRecord-> medicalRecord.getLastName().equals(p.getLastName())
                     && medicalRecord.getFirstName().equals(p.getFirstName())).findFirst().orElse(null);
             if (medRecFind != null){
-                if(medRecFind.getAge()<18){
+                if(getAgeFromMedicalRecord(medRecFind.getBirthdate())<18){
                     personNode.put("lastName", p.getLastName());
                     personNode.put("firstName", p.getFirstName());
-                    personNode.put("age", medRecFind.getAge());
+                    personNode.put("age", getAgeFromMedicalRecord(medRecFind.getBirthdate()));
                     listChildren.add(personNode);
                 }else {
                     personNode.put("lastName", p.getLastName());
@@ -114,7 +117,7 @@ public class InformationService {
             personNode.put("phone",p.getPhone());
 
             if (medRecFind != null){
-                personNode.put("age",medRecFind.getAge());
+                personNode.put("age",getAgeFromMedicalRecord(medRecFind.getBirthdate()));
                 ArrayNode listMedications = mapper.createArrayNode();
                 ArrayNode listAllergies = mapper.createArrayNode();
                 for (String med : medRecFind.getMedications()) {
@@ -150,7 +153,7 @@ public class InformationService {
                 personNode.put("phone",person.getPhone());
 
                 if (medRecFind != null){
-                    personNode.put("age",medRecFind.getAge());
+                    personNode.put("age",getAgeFromMedicalRecord(medRecFind.getBirthdate()));
                     ArrayNode listMedications = mapper.createArrayNode();
                     ArrayNode listAllergies = mapper.createArrayNode();
                     for (String med : medRecFind.getMedications()) {
@@ -187,7 +190,7 @@ public class InformationService {
             personNode.put("email", p.getEmail());
 
             if (medRecFind != null){
-                personNode.put("age",medRecFind.getAge());
+                personNode.put("age",getAgeFromMedicalRecord(medRecFind.getBirthdate()));
                 ArrayNode listMedications = mapper.createArrayNode();
                 ArrayNode listAllergies = mapper.createArrayNode();
                 for (String med : medRecFind.getMedications()) {
@@ -212,5 +215,10 @@ public class InformationService {
             emailFound.add(person.getEmail());
         }
         return emailFound;
+    }
+
+    private int getAgeFromMedicalRecord(String birthdate){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+        return Period.between(LocalDate.parse(birthdate,formatter), LocalDate.now()).getYears();
     }
 }
