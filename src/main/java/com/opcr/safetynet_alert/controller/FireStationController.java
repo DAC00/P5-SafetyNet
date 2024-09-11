@@ -14,10 +14,9 @@ import org.springframework.web.bind.annotation.*;
 public class FireStationController {
 
     private static final Logger logger = LogManager.getLogger(FireStationController.class);
-
-    @Autowired
     private final FireStationService fireStationService;
 
+    @Autowired
     public FireStationController(FireStationService fireStationService) {
         this.fireStationService = fireStationService;
     }

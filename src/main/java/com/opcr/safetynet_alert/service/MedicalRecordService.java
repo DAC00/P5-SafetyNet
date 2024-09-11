@@ -13,40 +13,40 @@ public class MedicalRecordService {
     @Autowired
     private JsonDataUtils jsonDataUtils;
 
-    public void addMedicalRecord(MedicalRecord medicalRecordToAdd){
+    public boolean addMedicalRecord(MedicalRecord medicalRecordToAdd) {
         ArrayList<MedicalRecord> medicalRecords = jsonDataUtils.getMedicalRecords();
-        if(!medicalRecords.contains(medicalRecordToAdd)){
+        if (!medicalRecords.contains(medicalRecordToAdd)) {
             medicalRecords.add(medicalRecordToAdd);
             jsonDataUtils.updateMedicalRecords(medicalRecords);
-            System.out.println(medicalRecordToAdd.toString() + " : Added");
-        }else {
-            System.out.println(medicalRecordToAdd.toString() + " : Already existing");
+            return true;
+        } else {
+            return false;
         }
     }
 
-    public void deleteMedicalRecord(MedicalRecord medicalRecordToDelete){
+    public boolean deleteMedicalRecord(MedicalRecord medicalRecordToDelete) {
         ArrayList<MedicalRecord> medicalRecords = jsonDataUtils.getMedicalRecords();
-        if(medicalRecords.contains(medicalRecordToDelete)){
+        if (medicalRecords.contains(medicalRecordToDelete)) {
             medicalRecords.remove(medicalRecordToDelete);
             jsonDataUtils.updateMedicalRecords(medicalRecords);
-            System.out.println(medicalRecordToDelete.toString() + " : Deleted");
-        }else {
-            System.out.println(medicalRecordToDelete.toString() + " : Not existing");
+            return true;
+        } else {
+            return false;
         }
     }
 
-    public void updateMedicalRecord(MedicalRecord medicalRecord){
+    public boolean updateMedicalRecord(MedicalRecord medicalRecord) {
         ArrayList<MedicalRecord> medicalRecords = jsonDataUtils.getMedicalRecords();
-        for(MedicalRecord mr : medicalRecords){
-            if(mr.getFirstName().equals(medicalRecord.getFirstName()) &&
-                    mr.getLastName().equals(medicalRecord.getLastName())){
+        for (MedicalRecord mr : medicalRecords) {
+            if (mr.getFirstName().equals(medicalRecord.getFirstName()) &&
+                    mr.getLastName().equals(medicalRecord.getLastName())) {
                 mr.setBirthdate(medicalRecord.getBirthdate());
                 mr.setMedications(medicalRecord.getMedications());
                 mr.setAllergies(medicalRecord.getAllergies());
                 jsonDataUtils.updateMedicalRecords(medicalRecords);
-                System.out.println(medicalRecord.toString() + " : Updated");
-                break;
+                return true;
             }
         }
+        return false;
     }
 }

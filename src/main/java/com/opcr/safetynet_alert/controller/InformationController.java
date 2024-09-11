@@ -44,7 +44,7 @@ public class InformationController {
 
     @GetMapping("/fire")
     public ObjectNode findPersonAndFireStationNumberFromAddress(@RequestParam(value = "address") String address) {
-        logger.info("GET Request /fire?adress={}",address);
+        logger.info("GET Request /fire?address={}",address);
         return informationService.findPersonAndFireStationNumberFromAddress(address);
     }
 
