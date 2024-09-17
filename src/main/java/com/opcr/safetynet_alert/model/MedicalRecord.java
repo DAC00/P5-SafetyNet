@@ -3,6 +3,7 @@ package com.opcr.safetynet_alert.model;
 import java.util.List;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -32,7 +33,15 @@ public class MedicalRecord {
     @JsonProperty("allergies")
     private List<String> allergies;
 
-    @JsonProperty("allergies")
+    @JsonCreator
+    public MedicalRecord(@JsonProperty("firstName") String firstName, @JsonProperty("lastName") String lastName, @JsonProperty("birthdate") String birthdate, @JsonProperty("allergies") List<String> allergies, @JsonProperty("medications") List<String> medications) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.birthdate = birthdate;
+        this.allergies = allergies;
+        this.medications = medications;
+    }
+
     public List<String> getAllergies() {
         return allergies;
     }
@@ -78,5 +87,16 @@ public class MedicalRecord {
         if (this == o) return true;
         if (!(o instanceof MedicalRecord that)) return false;
         return Objects.equals(firstName, that.firstName) && Objects.equals(lastName, that.lastName);
+    }
+
+    @Override
+    public String toString() {
+        return "MedicalRecord{" +
+                "firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", birthdate='" + birthdate + '\'' +
+                ", medications=" + medications +
+                ", allergies=" + allergies +
+                '}';
     }
 }

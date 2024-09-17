@@ -1,5 +1,6 @@
 package com.opcr.safetynet_alert.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -38,6 +39,17 @@ public class Person {
 
     @JsonProperty("email")
     private String email;
+
+    @JsonCreator
+    public Person(@JsonProperty("firstName")String firstName, @JsonProperty("lastName")String lastName, @JsonProperty("address")String address, @JsonProperty("city") String city, @JsonProperty("zip")String zip, @JsonProperty("phone")String phone, @JsonProperty("email")String email) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.address = address;
+        this.city = city;
+        this.zip = zip;
+        this.phone = phone;
+        this.email = email;
+    }
 
     public String getFirstName() {
         return firstName;
@@ -100,5 +112,18 @@ public class Person {
         if (this == o) return true;
         if (!(o instanceof Person person)) return false;
         return Objects.equals(firstName, person.firstName) && Objects.equals(lastName, person.lastName);
+    }
+
+    @Override
+    public String toString() {
+        return "Person{" +
+                "firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", address='" + address + '\'' +
+                ", city='" + city + '\'' +
+                ", zip='" + zip + '\'' +
+                ", phone='" + phone + '\'' +
+                ", email='" + email + '\'' +
+                '}';
     }
 }

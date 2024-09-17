@@ -1,5 +1,6 @@
 package com.opcr.safetynet_alert.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -18,6 +19,12 @@ public class FireStation {
 
     @JsonProperty("station")
     private int station;
+
+    @JsonCreator
+    public FireStation(@JsonProperty("address")String address, @JsonProperty("station") int station) {
+        this.address = address;
+        this.station = station;
+    }
 
     public int getStation() {
         return station;
@@ -40,5 +47,13 @@ public class FireStation {
         if (this == o) return true;
         if (!(o instanceof FireStation that)) return false;
         return station == that.station && Objects.equals(address, that.address);
+    }
+
+    @Override
+    public String toString() {
+        return "FireStation{" +
+                "address='" + address + '\'' +
+                ", station=" + station +
+                '}';
     }
 }
