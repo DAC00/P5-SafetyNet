@@ -1,5 +1,9 @@
 package com.opcr.safetynet_alert.controller;
 
+import com.opcr.safetynet_alert.exceptions.MedicalRecordAlreadyExistException;
+import com.opcr.safetynet_alert.exceptions.MedicalRecordNotFoundException;
+import com.opcr.safetynet_alert.exceptions.PersonAlreadyExistException;
+import com.opcr.safetynet_alert.exceptions.PersonNotFoundException;
 import com.opcr.safetynet_alert.model.Person;
 import com.opcr.safetynet_alert.service.PersonService;
 import org.apache.logging.log4j.LogManager;
@@ -24,36 +28,45 @@ public class PersonController {
     @PutMapping
     public ResponseEntity<String> addPerson(@RequestBody Person person){
         logger.info("PUT Request /person {}",person.toString());
-        if (personService.addPerson(person)) {
+        try {
+            personService.addPerson(person);
             logger.info("PUT Request completed successfully.");
             return ResponseEntity.status(HttpStatus.CREATED).body("Person Added.");
-        }else{
-            logger.error("PUT Request failed.");
-            return ResponseEntity.badRequest().body("Person already existing.");
+        }catch (PersonAlreadyExistException e){
+            return ResponseEntity.badRequest().body("Person already exist.");
+        }catch (NullPointerException e){
+            logger.error(e.getMessage());
+            return ResponseEntity.badRequest().body("Person is null.");
         }
     }
 
     @DeleteMapping
     public ResponseEntity<String> deletePerson(@RequestBody Person person){
         logger.info("DELETE Request /person {}",person.toString());
-        if(personService.deletePerson(person)){
+        try {
+            personService.deletePerson(person);
             logger.info("DELETE Request completed successfully.");
             return ResponseEntity.noContent().build();
-        }else{
-            logger.error("DELETE Request failed.");
-            return ResponseEntity.notFound().build();
+        }catch (PersonNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Person not found.");
+        }catch (NullPointerException e){
+            logger.error(e.getMessage());
+            return ResponseEntity.badRequest().body("Person is null.");
         }
     }
 
     @PostMapping
     public ResponseEntity<String> updatePerson(@RequestBody Person person){
         logger.info("POST Request /person {}",person);
-        if(personService.updatePerson(person)){
+        try {
+            personService.updatePerson(person);
             logger.info("POST Request completed successfully.");
             return ResponseEntity.status(HttpStatus.OK).body("Person updated.");
-        }else{
-            logger.error("POST Request failed.");
-            return ResponseEntity.notFound().build();
+        }catch (PersonNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Person not found.");
+        }catch (NullPointerException e){
+            logger.error(e.getMessage());
+            return ResponseEntity.badRequest().body("Person is null.");
         }
     }
 }
