@@ -31,10 +31,9 @@ public class MedicalRecordController {
             logger.info("PUT Request completed successfully.");
             return ResponseEntity.status(HttpStatus.CREATED).body("MedicalRecord Added.");
         }catch (MedicalRecordAlreadyExistException e){
-            return ResponseEntity.badRequest().body("MedicalRecord already exist.");
-        }catch (NullPointerException e){
-            logger.error(e.getMessage());
-            return ResponseEntity.badRequest().body("MedicalRecord is null.");
+            String errorMessage = "MedicalRecord already exist : %s".formatted(e.getMessage());
+            logger.error(errorMessage);
+            return ResponseEntity.badRequest().body(errorMessage);
         }
     }
 
@@ -44,12 +43,11 @@ public class MedicalRecordController {
         try {
             medicalRecordService.deleteMedicalRecord(medicalRecord);
             logger.info("DELETE Request completed successfully.");
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("MedicalRecord deleted.");
         }catch (MedicalRecordNotFoundException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("MedicalRecord not found.");
-        }catch (NullPointerException e){
-            logger.error(e.getMessage());
-            return ResponseEntity.badRequest().body("MedicalRecord is null.");
+            String errorMessage = "MedicalRecord not found : %s".formatted(e.getMessage());
+            logger.error(errorMessage);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
         }
     }
 
@@ -61,10 +59,9 @@ public class MedicalRecordController {
             logger.info("POST Request completed successfully.");
             return ResponseEntity.status(HttpStatus.OK).body("MedicalRecord updated.");
         }catch (MedicalRecordNotFoundException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("MedicalRecord not found.");
-        }catch (NullPointerException e){
-            logger.error(e.getMessage());
-            return ResponseEntity.badRequest().body("MedicalRecord is null.");
+            String errorMessage = "MedicalRecord not found : %s".formatted(e.getMessage());
+            logger.error(errorMessage);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
         }
     }
 }

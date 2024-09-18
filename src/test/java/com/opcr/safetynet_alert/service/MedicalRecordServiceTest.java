@@ -35,16 +35,14 @@ public class MedicalRecordServiceTest {
     public void init(){
         this.medicalRecordTest = null;
         ArrayList<MedicalRecord> medicalRecords = new ArrayList<>();
-
         medicalRecords.add(new MedicalRecord("Esteban","Test1","03/06/1989",new ArrayList<>(Arrays.asList("Fish","Meat")),new ArrayList<>()));
         medicalRecords.add(new MedicalRecord("Fran","Test2","20/05/1991",new ArrayList<>(Arrays.asList("Fish","Nut")),new ArrayList<>(Arrays.asList("terazine:10mg", "noznazol:250mg"))));
         medicalRecords.add(new MedicalRecord("Michel","Test3","03/11/1970",new ArrayList<>(),new ArrayList<>(Arrays.asList("aznol:350mg", "hydrapermazol:100mg"))));
-        medicalRecords.add(new MedicalRecord("Blanca","Test3","09/05/2001",new ArrayList<>(),new ArrayList<>()));
         when(jsonDataUtils.getMedicalRecords()).thenReturn(medicalRecords);
     }
 
     @Test
-    public void addMedicalRecordTest() {
+    public void addMedicalRecordTest() throws MedicalRecordAlreadyExistException {
         medicalRecordTest = new MedicalRecord("New","Test4","19/05/2004",new ArrayList<>(),new ArrayList<>());
         medicalRecordService.addMedicalRecord(medicalRecordTest);
         verify(jsonDataUtils, Mockito.times(1)).updateMedicalRecords(any(ArrayList.class));
@@ -57,12 +55,7 @@ public class MedicalRecordServiceTest {
     }
 
     @Test
-    public void addMedicalRecordNullTest(){
-        assertThrows(NullPointerException.class, () -> medicalRecordService.addMedicalRecord(null));
-    }
-
-    @Test
-    public void deleteMedicalRecordTest() {
+    public void deleteMedicalRecordTest() throws MedicalRecordNotFoundException {
         medicalRecordTest = new MedicalRecord("Esteban","Test1","03/06/1989",new ArrayList<>(),new ArrayList<>());
         medicalRecordService.deleteMedicalRecord(medicalRecordTest);
         verify(jsonDataUtils, Mockito.times(1)).updateMedicalRecords(any(ArrayList.class));
@@ -75,13 +68,9 @@ public class MedicalRecordServiceTest {
     }
 
     @Test
-    public void deleteMedicalRecordNullTest(){
-        assertThrows(NullPointerException.class, () -> medicalRecordService.deleteMedicalRecord(null));
-    }
-
-    @Test
-    public void updateMedicalRecordTest() {
-        medicalRecordTest = new MedicalRecord("Michel","Test3","03/11/1970",new ArrayList<>(Arrays.asList("Allergies1","Allergies2")),new ArrayList<>(Arrays.asList("aznol:350mg", "hydrapermazol:100mg")));
+    public void updateMedicalRecordTest() throws MedicalRecordNotFoundException {
+        medicalRecordTest = new MedicalRecord("Michel","Test3","03/11/1970",new ArrayList<>(Arrays.asList("Allergies1","Allergies2")),
+                new ArrayList<>(Arrays.asList("aznol:350mg", "hydrapermazol:100mg")));
         medicalRecordService.updateMedicalRecord(medicalRecordTest);
         verify(jsonDataUtils, Mockito.times(1)).updateMedicalRecords(any(ArrayList.class));
     }
@@ -90,10 +79,5 @@ public class MedicalRecordServiceTest {
     public void updateMedicalRecordNotExistingTest() {
         medicalRecordTest = new MedicalRecord("New","Test4","19/05/2004",new ArrayList<>(),new ArrayList<>());
         assertThrows(MedicalRecordNotFoundException.class, () -> medicalRecordService.updateMedicalRecord(medicalRecordTest));
-    }
-
-    @Test
-    public void updateMedicalRecordNullTest() {
-        assertThrows(NullPointerException.class, () -> medicalRecordService.updateMedicalRecord(null));
     }
 }

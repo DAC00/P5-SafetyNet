@@ -18,36 +18,32 @@ public class MedicalRecordService {
     @Autowired
     private JsonDataUtils jsonDataUtils;
 
-    public void addMedicalRecord(MedicalRecord medicalRecordToAdd) {
+    public void addMedicalRecord(MedicalRecord medicalRecordToAdd) throws MedicalRecordAlreadyExistException {
         ArrayList<MedicalRecord> medicalRecords = jsonDataUtils.getMedicalRecords();
 
-        if (!medicalRecords.contains(medicalRecordToAdd) && medicalRecordToAdd != null) {
+        if (!medicalRecords.contains(medicalRecordToAdd)) {
             medicalRecords.add(medicalRecordToAdd);
             jsonDataUtils.updateMedicalRecords(medicalRecords);
-        } else if (medicalRecordToAdd == null) {
-            throw new NullPointerException();
-        } else {
+        }else {
             throw new MedicalRecordAlreadyExistException(medicalRecordToAdd.toString());
         }
     }
 
-    public void deleteMedicalRecord(MedicalRecord medicalRecordToDelete) {
+    public void deleteMedicalRecord(MedicalRecord medicalRecordToDelete) throws MedicalRecordNotFoundException {
         ArrayList<MedicalRecord> medicalRecords = jsonDataUtils.getMedicalRecords();
 
-        if (medicalRecords.contains(medicalRecordToDelete) && medicalRecordToDelete != null) {
+        if (medicalRecords.contains(medicalRecordToDelete)) {
             medicalRecords.remove(medicalRecordToDelete);
             jsonDataUtils.updateMedicalRecords(medicalRecords);
-        } else if (medicalRecordToDelete == null) {
-            throw new NullPointerException();
-        } else {
+        }else {
             throw new MedicalRecordNotFoundException(medicalRecordToDelete.toString());
         }
     }
 
-    public void updateMedicalRecord(MedicalRecord medicalRecord) {
+    public void updateMedicalRecord(MedicalRecord medicalRecord) throws MedicalRecordNotFoundException {
         ArrayList<MedicalRecord> medicalRecords = jsonDataUtils.getMedicalRecords();
 
-        if (medicalRecords.contains(medicalRecord) && medicalRecord != null) {
+        if (medicalRecords.contains(medicalRecord)) {
             for (MedicalRecord mr : medicalRecords.stream().filter(mr -> mr.getFirstName().equals(medicalRecord.getFirstName())
                     && mr.getLastName().equals(medicalRecord.getLastName())).toList()) {
                     mr.setBirthdate(medicalRecord.getBirthdate());
@@ -56,9 +52,7 @@ public class MedicalRecordService {
                     jsonDataUtils.updateMedicalRecords(medicalRecords);
                     break;
             }
-        } else if (medicalRecord == null) {
-            throw new NullPointerException();
-        } else {
+        }else {
             throw new MedicalRecordNotFoundException(medicalRecord.toString());
         }
     }
