@@ -40,7 +40,7 @@ public class FireStationServiceTest {
     }
 
     @Test
-    public void addFireStationTest() {
+    public void addFireStationTest() throws FireStationAlreadyExistException {
         fireStationTest = new FireStation("NINE Street", 1);
         fireStationService.addFireStation(fireStationTest);
         verify(jsonDataUtils, Mockito.times(1)).updateFireStations(any(ArrayList.class));
@@ -53,12 +53,7 @@ public class FireStationServiceTest {
     }
 
     @Test
-    public void addFireStationNullTest(){
-        assertThrows(NullPointerException.class, () -> fireStationService.addFireStation(null));
-    }
-
-    @Test
-    public void deleteFireStationTest() {
+    public void deleteFireStationTest() throws FireStationNotFoundException {
         fireStationTest = new FireStation("THREE Road", 3);
         fireStationService.deleteFireStation(fireStationTest);
         verify(jsonDataUtils, Mockito.times(1)).updateFireStations(any(ArrayList.class));
@@ -71,12 +66,7 @@ public class FireStationServiceTest {
     }
 
     @Test
-    public void deleteFireStationNullTest(){
-        assertThrows(NullPointerException.class, () -> fireStationService.deleteFireStation(null));
-    }
-
-    @Test
-    public void updateFireStationTest() {
+    public void updateFireStationTest() throws FireStationNotFoundException {
         fireStationTest = new FireStation("THREE Road", 10);
         fireStationService.updateFireStation(fireStationTest);
         verify(jsonDataUtils, Mockito.times(1)).updateFireStations(any(ArrayList.class));
@@ -86,10 +76,5 @@ public class FireStationServiceTest {
     public void updateFireStationNotExistingTest() {
         fireStationTest = new FireStation("NINE Street", 1);
         assertThrows(FireStationNotFoundException.class, () -> fireStationService.updateFireStation(fireStationTest));
-    }
-
-    @Test
-    public void updateFireStationNullTest() {
-        assertThrows(NullPointerException.class, () -> fireStationService.updateFireStation(null));
     }
 }

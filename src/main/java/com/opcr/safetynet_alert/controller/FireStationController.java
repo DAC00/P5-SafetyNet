@@ -24,47 +24,44 @@ public class FireStationController {
     }
 
     @PutMapping
-    public ResponseEntity<String> addFireStation(@RequestBody FireStation firestation){
-        logger.info("PUT Request /firestation {}",firestation.toString());
+    public ResponseEntity<String> addFireStation(@RequestBody FireStation firestation) {
+        logger.info("PUT Request /firestation {}", firestation.toString());
         try {
             fireStationService.addFireStation(firestation);
             logger.info("PUT Request completed successfully.");
             return ResponseEntity.status(HttpStatus.CREATED).body("FireStation added.");
-        }catch (FireStationAlreadyExistException e){
-            return ResponseEntity.badRequest().body("FireStation already exist.");
-        }catch (NullPointerException e){
-            logger.error(e.getMessage());
-            return ResponseEntity.badRequest().body("FireStation is null.");
+        } catch (FireStationAlreadyExistException e) {
+            String errorMessage = "FireStation already exist : %s".formatted(e.getMessage());
+            logger.error(errorMessage);
+            return ResponseEntity.badRequest().body(errorMessage);
         }
     }
 
     @DeleteMapping
-    public ResponseEntity<String> deleteFireStation(@RequestBody FireStation firestation){
-        logger.info("DELETE Request /firestation {}",firestation.toString());
+    public ResponseEntity<String> deleteFireStation(@RequestBody FireStation firestation) {
+        logger.info("DELETE Request /firestation {}", firestation.toString());
         try {
             fireStationService.deleteFireStation(firestation);
             logger.info("DELETE Request completed successfully.");
-            return ResponseEntity.noContent().build();
-        }catch (FireStationNotFoundException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("FireStation not found.");
-        }catch (NullPointerException e){
-            logger.error(e.getMessage());
-            return ResponseEntity.badRequest().body("FireStation is null.");
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("FireStation deleted.");
+        } catch (FireStationNotFoundException e) {
+            String errorMessage = "FireStation not found : %s".formatted(e.getMessage());
+            logger.error(errorMessage);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
         }
     }
 
     @PostMapping
-    public ResponseEntity<String> updateFireStation(@RequestBody FireStation firestation){
-        logger.info("POST Request /firestation {}",firestation);
+    public ResponseEntity<String> updateFireStation(@RequestBody FireStation firestation) {
+        logger.info("POST Request /firestation {}", firestation);
         try {
             fireStationService.updateFireStation(firestation);
             logger.info("POST Request completed successfully.");
             return ResponseEntity.status(HttpStatus.OK).body("FireStation updated.");
-        }catch (FireStationNotFoundException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("FireStation not found.");
-        }catch (NullPointerException e){
-            logger.error(e.getMessage());
-            return ResponseEntity.badRequest().body("FireStation is null.");
+        } catch (FireStationNotFoundException e) {
+            String errorMessage = "FireStation not found : %s".formatted(e.getMessage());
+            logger.error(errorMessage);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
         }
     }
 }
