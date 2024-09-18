@@ -18,36 +18,32 @@ public class PersonService {
     @Autowired
     private JsonDataUtils jsonDataUtils;
 
-    public void addPerson(Person personToAdd) {
+    public void addPerson(Person personToAdd) throws PersonAlreadyExistException {
         ArrayList<Person> persons = jsonDataUtils.getPersons();
 
-        if (!persons.contains(personToAdd) && personToAdd != null) {
+        if (!persons.contains(personToAdd)) {
             persons.add(personToAdd);
             jsonDataUtils.updatePersons(persons);
-        } else if (personToAdd == null) {
-            throw new NullPointerException();
         } else {
             throw new PersonAlreadyExistException(personToAdd.toString());
         }
     }
 
-    public void deletePerson(Person personToDelete) {
+    public void deletePerson(Person personToDelete) throws PersonNotFoundException {
         ArrayList<Person> persons = jsonDataUtils.getPersons();
 
-        if (persons.contains(personToDelete) && personToDelete != null) {
+        if (persons.contains(personToDelete)) {
             persons.remove(personToDelete);
             jsonDataUtils.updatePersons(persons);
-        } else if (personToDelete == null) {
-            throw new NullPointerException();
-        } else {
+        }else {
             throw new PersonNotFoundException(personToDelete.toString());
         }
     }
 
-    public void updatePerson(Person personToUpdate) {
+    public void updatePerson(Person personToUpdate) throws PersonNotFoundException {
         ArrayList<Person> persons = jsonDataUtils.getPersons();
 
-        if (persons.contains(personToUpdate) && personToUpdate != null) {
+        if (persons.contains(personToUpdate)) {
             for (Person p : persons.stream().filter(p -> p.getFirstName().equals(personToUpdate.getFirstName())
                     && p.getLastName().equals(personToUpdate.getLastName())).toList()) {
 
@@ -59,9 +55,7 @@ public class PersonService {
                 jsonDataUtils.updatePersons(persons);
                 break;
             }
-        } else if (personToUpdate == null) {
-            throw new NullPointerException();
-        } else {
+        }else {
             throw new PersonNotFoundException(personToUpdate.toString());
         }
     }

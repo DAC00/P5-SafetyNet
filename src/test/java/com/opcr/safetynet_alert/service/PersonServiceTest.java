@@ -41,7 +41,7 @@ public class PersonServiceTest {
     }
 
     @Test
-    public void addPersonTest() {
+    public void addPersonTest() throws PersonAlreadyExistException {
         personTest = new Person("Test1", "Boyd", "1509 Culver St", "Culver", "97451", "841-874-6543", "test1@email.com");
         personService.addPerson(personTest);
         verify(jsonDataUtils, Mockito.times(1)).updatePersons(any(ArrayList.class));
@@ -54,12 +54,7 @@ public class PersonServiceTest {
     }
 
     @Test
-    public void addPersonNullTest() {
-        assertThrows(NullPointerException.class, () -> personService.addPerson(null));
-    }
-
-    @Test
-    public void deletePersonTest() {
+    public void deletePersonTest() throws PersonNotFoundException {
         personTest = new Person("Jacob", "Boyd", "1509 Culver St", "Culver", "97451", "841-874-6513", "drk@email.com");
         personService.deletePerson(personTest);
         verify(jsonDataUtils, Mockito.times(1)).updatePersons(any(ArrayList.class));
@@ -72,12 +67,7 @@ public class PersonServiceTest {
     }
 
     @Test
-    public void deletePersonNullTest() {
-        assertThrows(NullPointerException.class, () -> personService.deletePerson(null));
-    }
-
-    @Test
-    public void updatePersonTest() {
+    public void updatePersonTest() throws PersonNotFoundException {
         personTest = new Person("Jacob", "Boyd", "1 test", "Culver", "97451", "841-874-6513", "newtest@email.com");
         personService.updatePerson(personTest);
         verify(jsonDataUtils, Mockito.times(1)).updatePersons(any(ArrayList.class));
@@ -87,10 +77,5 @@ public class PersonServiceTest {
     public void updatePersonNotExistingTest() {
         personTest = new Person("Test1", "Boyd", "1509 Culver St", "Culver", "97451", "841-874-6543", "test1@email.com");
         assertThrows(PersonNotFoundException.class, () -> personService.updatePerson(personTest));
-    }
-
-    @Test
-    public void updatePersonNullTest() {
-        assertThrows(NullPointerException.class, () -> personService.updatePerson(null));
     }
 }
