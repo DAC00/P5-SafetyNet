@@ -15,39 +15,54 @@ public class FireStationService {
     @Autowired
     private JsonDataUtils jsonDataUtils;
 
-    public void addFireStation(FireStation fireStation) throws FireStationAlreadyExistException {
+    /**
+     * Add a FireStation if fireStationToAdd does not exist in the list of FireStation.
+     *
+     * @param fireStationToAdd FireStation to add.
+     * @throws FireStationAlreadyExistException if fireStationToAdd already exist.
+     **/
+    public void addFireStation(FireStation fireStationToAdd) throws FireStationAlreadyExistException {
         ArrayList<FireStation> fireStations = jsonDataUtils.getFireStations();
-
-        if (!fireStations.contains(fireStation)) {
-            fireStations.add(fireStation);
+        if (!fireStations.contains(fireStationToAdd)) {
+            fireStations.add(fireStationToAdd);
             jsonDataUtils.updateFireStations(fireStations);
         } else {
-            throw new FireStationAlreadyExistException(fireStation.toString());
+            throw new FireStationAlreadyExistException(fireStationToAdd.toString());
         }
     }
 
-    public void deleteFireStation(FireStation fireStation) throws FireStationNotFoundException {
+    /**
+     * Delete a FireStation if fireStationToDelete exist in the list of FireStation.
+     *
+     * @param fireStationToDelete FireStation to delete.
+     * @throws FireStationNotFoundException if fireStationToDelete is not found.
+     **/
+    public void deleteFireStation(FireStation fireStationToDelete) throws FireStationNotFoundException {
         ArrayList<FireStation> fireStations = jsonDataUtils.getFireStations();
-
-        if (fireStations.contains(fireStation) && fireStation != null) {
-            fireStations.remove(fireStation);
+        if (fireStations.contains(fireStationToDelete)) {
+            fireStations.remove(fireStationToDelete);
             jsonDataUtils.updateFireStations(fireStations);
         } else {
-            throw new FireStationNotFoundException(fireStation.toString());
+            throw new FireStationNotFoundException(fireStationToDelete.toString());
         }
     }
 
-    public void updateFireStation(FireStation fireStation) throws FireStationNotFoundException {
+    /**
+     * Update a FireStation if one with the same address exist in the list of FireStation.
+     *
+     * @param fireStationToUpdate FireStation to update.
+     * @throws FireStationNotFoundException if fireStationToUpdate is not found.
+     **/
+    public void updateFireStation(FireStation fireStationToUpdate) throws FireStationNotFoundException {
         ArrayList<FireStation> fireStations = jsonDataUtils.getFireStations();
-
-        if (fireStations.stream().anyMatch(f -> f.getAddress().equals(fireStation.getAddress()))) {
-            for (FireStation f : fireStations.stream().filter(f -> f.getAddress().equals(fireStation.getAddress())).toList()) {
-                f.setStation(fireStation.getStation());
+        if (fireStations.stream().anyMatch(f -> f.getAddress().equals(fireStationToUpdate.getAddress()))) {
+            for (FireStation f : fireStations.stream().filter(f -> f.getAddress().equals(fireStationToUpdate.getAddress())).toList()) {
+                f.setStation(fireStationToUpdate.getStation());
                 jsonDataUtils.updateFireStations(fireStations);
                 break;
             }
         } else {
-            throw new FireStationNotFoundException(fireStation.toString());
+            throw new FireStationNotFoundException(fireStationToUpdate.toString());
         }
     }
 }
