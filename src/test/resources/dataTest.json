@@ -1,0 +1,70 @@
+{
+  "persons" : [ {
+    "firstName" : "One",
+    "lastName" : "Test",
+    "address" : "11 Test St",
+    "city" : "cityTest",
+    "zip" : "12345",
+    "phone" : "111-111-1111",
+    "email" : "one@email.com"
+  }, {
+    "firstName" : "Three",
+    "lastName" : "LeTest",
+    "address" : "22 Test St",
+    "city" : "cityTest",
+    "zip" : "12345",
+    "phone" : "333-333-3333",
+    "email" : "three@email.com"
+  }, {
+    "firstName" : "Four",
+    "lastName" : "Example",
+    "address" : "33 Test St",
+    "city" : "cityTest",
+    "zip" : "12345",
+    "phone" : "444-444-4444",
+    "email" : "four@email.com"
+  }, {
+    "firstName" : "Two",
+    "lastName" : "Test",
+    "address" : "11 Test St",
+    "city" : "cityTest",
+    "zip" : "12345",
+    "phone" : "222-222-2222",
+    "email" : "two@email.com"
+  } ],
+  "firestations" : [ {
+    "address" : "11 Test St",
+    "station" : 1
+  }, {
+    "address" : "22 Test St",
+    "station" : 2
+  }, {
+    "address" : "33 Test St",
+    "station" : 2
+  } ],
+  "medicalrecords" : [ {
+    "firstName" : "One",
+    "lastName" : "Test",
+    "birthdate" : "01/01/1981",
+    "medications" : [ "aznol:350mg", "hydrapermazol:100mg" ],
+    "allergies" : [ "nillacilan" ]
+  }, {
+    "firstName" : "Two",
+    "lastName" : "Test",
+    "birthdate" : "02/02/2020",
+    "medications" : [ "pharmacol:5000mg", "terazine:10mg", "noznazol:250mg" ],
+    "allergies" : [ ]
+  }, {
+    "firstName" : "Three",
+    "lastName" : "LeTest",
+    "birthdate" : "03/03/1933",
+    "medications" : [ ],
+    "allergies" : [ "peanut" ]
+  }, {
+    "firstName" : "Four",
+    "lastName" : "Example",
+    "birthdate" : "04/04/1944",
+    "medications" : [ ],
+    "allergies" : [ ]
+  } ]
+}

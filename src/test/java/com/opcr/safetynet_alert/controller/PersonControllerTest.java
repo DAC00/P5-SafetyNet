@@ -1,96 +1,139 @@
 package com.opcr.safetynet_alert.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.opcr.safetynet_alert.exceptions.MedicalRecordAlreadyExistException;
-import com.opcr.safetynet_alert.exceptions.MedicalRecordNotFoundException;
-import com.opcr.safetynet_alert.exceptions.PersonAlreadyExistException;
-import com.opcr.safetynet_alert.exceptions.PersonNotFoundException;
-import com.opcr.safetynet_alert.model.FireStation;
+import com.opcr.safetynet_alert.JsonDataUtils;
 import com.opcr.safetynet_alert.model.Person;
-import com.opcr.safetynet_alert.service.FireStationService;
 import com.opcr.safetynet_alert.service.PersonService;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.mockito.Mockito.doThrow;
+import java.util.ArrayList;
+import java.util.Optional;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(PersonController.class)
+@SpringBootTest
+@AutoConfigureMockMvc
 public class PersonControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @Autowired
     private PersonService personService;
 
-    private static Person person;
+    @Autowired
+    private JsonDataUtils jsonDataUtils;
+
+    private static Person personTest;
 
     @BeforeAll
     static void setup() {
-        person = new Person("Test0","Test1","Test2","Test3","000","111","Test6@mail.com");
+        personTest = new Person("Test0", "Test1", "Test2",
+                "Test3", "000", "111", "Test6@mail.com");
+    }
+
+    @AfterEach
+    public void cleanUp() {
+        ArrayList<Person> persons = new ArrayList<>();
+        persons.add(new Person("One", "Test", "11 Test St",
+                "cityTest", "12345", "111-111-1111", "one@email.com"));
+        persons.add(new Person("Three", "LeTest", "22 Test St",
+                "cityTest", "12345", "333-333-3333", "three@email.com"));
+        persons.add(new Person("Four", "Example", "33 Test St",
+                "cityTest", "12345", "444-444-4444", "four@email.com"));
+        persons.add(new Person("Two", "Test", "11 Test St",
+                "cityTest", "12345", "222-222-2222", "two@email.com"));
+        jsonDataUtils.updatePersons(persons);
     }
 
     @Test
     public void addPersonReturnCreatedTest() throws Exception {
-        this.mockMvc.perform(put("/person").contentType("application/json")
-                        .content(new ObjectMapper().writeValueAsString(person)))
+        this.mockMvc.perform(put("/person")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(personTest)))
                 .andExpect(status().isCreated())
                 .andExpect(content().string("Person added."));
+
+        jsonDataUtils.getDataFromJSON();
+        Assertions.assertTrue(jsonDataUtils.getPersons().contains(personTest));
     }
 
     @Test
     public void addPersonReturnBadRequestWhenAlreadyExistTest() throws Exception {
-        doThrow(new PersonAlreadyExistException(person.toString()))
-                .when(personService).addPerson(person);
+        Person personAlreadyExisting = new Person("Two", "Test", "11 Test St",
+                "cityTest", "12345", "222-222-2222", "two@email.com");
 
-        this.mockMvc.perform(put("/person").contentType("application/json")
-                        .content(new ObjectMapper().writeValueAsString(person)))
+        this.mockMvc.perform(put("/person")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(personAlreadyExisting)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("Person already exist : %s".formatted(person.toString())));
+                .andExpect(content().string("Person already exist : %s".formatted(personAlreadyExisting.toString())));
     }
 
     @Test
     public void deletePersonReturnNoContent() throws Exception {
-        this.mockMvc.perform(delete("/person").contentType("application/json")
-                        .content(new ObjectMapper().writeValueAsString(person)))
+        Person personToDelete = new Person("Two", "Test", "11 Test St",
+                "cityTest", "12345", "222-222-2222", "two@email.com");
+
+        this.mockMvc.perform(delete("/person")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(personToDelete)))
                 .andExpect(status().isNoContent())
                 .andExpect(content().string("Person deleted."));
+
+        jsonDataUtils.getDataFromJSON();
+        Assertions.assertFalse(jsonDataUtils.getPersons().contains(personToDelete));
     }
 
     @Test
     public void deletePersonReturnNotFoundTest() throws Exception {
-        doThrow(new PersonNotFoundException(person.toString()))
-                .when(personService).deletePerson(person);
-
-        this.mockMvc.perform(delete("/person").contentType("application/json")
-                        .content(new ObjectMapper().writeValueAsString(person)))
+        this.mockMvc.perform(delete("/person")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(personTest)))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("Person not found : %s".formatted(person.toString())));
+                .andExpect(content().string("Person not found : %s".formatted(personTest.toString())));
     }
 
     @Test
     public void updatePersonReturnOkTest() throws Exception {
-        this.mockMvc.perform(post("/person").contentType("application/json")
-                        .content(new ObjectMapper().writeValueAsString(person)))
+        Person personBefore = new Person("Two", "Test", "11 Test St",
+                "cityTest", "12345", "222-222-2222", "two@email.com");
+        Person personUpdated = new Person("Two", "Test", "11 Test St",
+                "cityTest", "55555", "555-222-2222", "newemail@email.com");
+
+        this.mockMvc.perform(post("/person")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(personUpdated)))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Person updated."));
+
+        jsonDataUtils.getDataFromJSON();
+        Assertions.assertTrue(jsonDataUtils.getPersons().contains(personUpdated));
+        Optional<Person> personFromData = jsonDataUtils.getPersons().stream().filter(p -> p.getLastName().equals(personUpdated.getLastName())
+                && p.getFirstName().equals(personUpdated.getFirstName())).findFirst();
+        personFromData.ifPresent(person -> Assertions.assertEquals(person.getAddress(), personUpdated.getAddress()));
+        personFromData.ifPresent(person -> Assertions.assertEquals(person.getCity(), personUpdated.getCity()));
+        personFromData.ifPresent(person -> Assertions.assertEquals(person.getZip(), personUpdated.getZip()));
+        personFromData.ifPresent(person -> Assertions.assertEquals(person.getPhone(), personUpdated.getPhone()));
+        personFromData.ifPresent(person -> Assertions.assertEquals(person.getEmail(), personUpdated.getEmail()));
     }
 
     @Test
     public void updatePersonReturnNotFoundTest() throws Exception {
-        doThrow(new PersonNotFoundException(person.toString()))
-                .when(personService).updatePerson(person);
-
-        this.mockMvc.perform(post("/person").contentType("application/json")
-                        .content(new ObjectMapper().writeValueAsString(person)))
+        this.mockMvc.perform(post("/person")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(personTest)))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("Person not found : %s".formatted(person.toString())));
+                .andExpect(content().string("Person not found : %s".formatted(personTest.toString())));
     }
 }
