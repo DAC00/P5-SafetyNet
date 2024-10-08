@@ -24,13 +24,13 @@ public class MedicalRecordController {
     }
 
     @PutMapping
-    public ResponseEntity<String> addMedicalRecord(@RequestBody MedicalRecord medicalRecord){
-        logger.info("PUT Request /medicalRecord {}",medicalRecord.toString());
+    public ResponseEntity<String> addMedicalRecord(@RequestBody MedicalRecord medicalRecord) {
+        logger.info("PUT Request /medicalRecord : %s".formatted(medicalRecord.toString()));
         try {
             medicalRecordService.addMedicalRecord(medicalRecord);
             logger.info("PUT Request completed successfully.");
             return ResponseEntity.status(HttpStatus.CREATED).body("MedicalRecord Added.");
-        }catch (MedicalRecordAlreadyExistException e){
+        } catch (MedicalRecordAlreadyExistException e) {
             String errorMessage = "MedicalRecord already exist : %s".formatted(e.getMessage());
             logger.error(errorMessage);
             return ResponseEntity.badRequest().body(errorMessage);
@@ -38,13 +38,13 @@ public class MedicalRecordController {
     }
 
     @DeleteMapping
-    public ResponseEntity<String> deleteMedicalRecord(@RequestBody MedicalRecord medicalRecord){
-        logger.info("DELETE Request /medicalRecord {}",medicalRecord.toString());
+    public ResponseEntity<String> deleteMedicalRecord(@RequestBody MedicalRecord medicalRecord) {
+        logger.info("DELETE Request /medicalRecord : %s".formatted(medicalRecord.toString()));
         try {
             medicalRecordService.deleteMedicalRecord(medicalRecord);
             logger.info("DELETE Request completed successfully.");
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body("MedicalRecord deleted.");
-        }catch (MedicalRecordNotFoundException e){
+        } catch (MedicalRecordNotFoundException e) {
             String errorMessage = "MedicalRecord not found : %s".formatted(e.getMessage());
             logger.error(errorMessage);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
@@ -52,13 +52,13 @@ public class MedicalRecordController {
     }
 
     @PostMapping
-    public ResponseEntity<String> updateMedicalRecord(@RequestBody MedicalRecord medicalRecord){
-        logger.info("POST Request /medicalRecord {}",medicalRecord);
+    public ResponseEntity<String> updateMedicalRecord(@RequestBody MedicalRecord medicalRecord) {
+        logger.info("POST Request /medicalRecord : %s".formatted(medicalRecord));
         try {
             medicalRecordService.updateMedicalRecord(medicalRecord);
             logger.info("POST Request completed successfully.");
             return ResponseEntity.status(HttpStatus.OK).body("MedicalRecord updated.");
-        }catch (MedicalRecordNotFoundException e){
+        } catch (MedicalRecordNotFoundException e) {
             String errorMessage = "MedicalRecord not found : %s".formatted(e.getMessage());
             logger.error(errorMessage);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);

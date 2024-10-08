@@ -25,7 +25,7 @@ public class PersonController {
 
     @PutMapping
     public ResponseEntity<String> addPerson(@RequestBody Person person) {
-        logger.info("PUT Request /person {}", person.toString());
+        logger.info("PUT Request /person : %s".formatted(person.toString()));
         try {
             personService.addPerson(person);
             logger.info("PUT Request completed successfully.");
@@ -39,7 +39,7 @@ public class PersonController {
 
     @DeleteMapping
     public ResponseEntity<String> deletePerson(@RequestBody Person person) {
-        logger.info("DELETE Request /person {}", person.toString());
+        logger.info("DELETE Request /person : %s".formatted(person.toString()));
         try {
             personService.deletePerson(person);
             logger.info("DELETE Request completed successfully.");
@@ -53,7 +53,7 @@ public class PersonController {
 
     @PostMapping
     public ResponseEntity<String> updatePerson(@RequestBody Person person) {
-        logger.info("POST Request /person {}", person);
+        logger.info("POST Request /person : %s".formatted(person));
         try {
             personService.updatePerson(person);
             logger.info("POST Request completed successfully.");

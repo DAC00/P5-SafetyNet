@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,70 +19,94 @@ import java.util.ArrayList;
 public class JsonDataUtils {
 
     private static final Logger logger = LogManager.getLogger(JsonDataUtils.class);
-    private final String filePath;
+    private String filePath;
     private JsonData jsonData;
 
     @Autowired
-    public JsonDataUtils(Environment environment){
+    public JsonDataUtils(Environment environment) {
         this.filePath = environment.getProperty("json.filepath");
         this.jsonData = null;
 
         getDataFromJSON();
 
-        logger.info("Persons : {}.",jsonData.getPersons().size());
-        logger.info("Stations : {}.",jsonData.getFireStations().size());
-        logger.info("MedicalRecords : {}.",jsonData.getMedicalRecords().size());
+        logger.info("File : %s.".formatted(filePath));
+        logger.info("Persons : %s.".formatted(jsonData.getPersons().size()));
+        logger.info("Stations : %s.".formatted(jsonData.getFireStations().size()));
+        logger.info("MedicalRecords : %s.".formatted(jsonData.getMedicalRecords().size()));
     }
 
-    private void getDataFromJSON(){
+    /**
+     * Read the data from the file and update the JsonData Object.
+     **/
+    public void getDataFromJSON() {
         try {
             ObjectMapper mapper = new ObjectMapper();
             jsonData = mapper.readValue(new File(filePath), JsonData.class);
-            logger.info("Data loaded from : {}",filePath);
+            logger.debug("Data loaded from : %s.".formatted(filePath));
         } catch (IOException e) {
             logger.error(e.getMessage());
             throw new RuntimeException(e);
         }
     }
 
-    private void updateJsonData(JsonData jsonDataToDate){
+    /**
+     * Update the file with a JsonData Object.
+     *
+     * @param jsonDataToDate to write in the file.
+     **/
+    private void updateJsonData(JsonData jsonDataToDate) {
         try {
             ObjectMapper mapper = new ObjectMapper();
-            mapper.writerWithDefaultPrettyPrinter().writeValue(new File(filePath),jsonDataToDate);
-            logger.info("Data updated : {}",filePath);
+            mapper.writerWithDefaultPrettyPrinter().writeValue(new File(filePath), jsonDataToDate);
+            logger.debug("Data updated : %s".formatted(filePath));
         } catch (IOException e) {
             logger.error(e.getMessage());
             throw new RuntimeException(e);
         }
     }
 
-    public void updatePersons(ArrayList<Person> persons){
+    /**
+     * Update the List of Person in jsonData.
+     *
+     * @param persons the list of Person to update.
+     **/
+    public void updatePersons(ArrayList<Person> persons) {
         JsonData jsonDataUpdated = jsonData;
         jsonDataUpdated.setPersons(persons);
         updateJsonData(jsonDataUpdated);
     }
 
-    public void updateFireStations(ArrayList<FireStation> fireStations){
+    /**
+     * Update the List of FireStation in jsonData.
+     *
+     * @param fireStations the list of FireStation to update.
+     **/
+    public void updateFireStations(ArrayList<FireStation> fireStations) {
         JsonData jsonDataUpdated = jsonData;
         jsonDataUpdated.setFireStations(fireStations);
         updateJsonData(jsonDataUpdated);
     }
 
-    public void updateMedicalRecords(ArrayList<MedicalRecord> medicalRecords){
+    /**
+     * Update the List of MedicalRecord in jsonData.
+     *
+     * @param medicalRecords the list of MedicalRecord to update.
+     **/
+    public void updateMedicalRecords(ArrayList<MedicalRecord> medicalRecords) {
         JsonData jsonDataUpdated = jsonData;
         jsonDataUpdated.setMedicalRecords(medicalRecords);
         updateJsonData(jsonDataUpdated);
     }
 
-    public ArrayList<Person> getPersons(){
+    public ArrayList<Person> getPersons() {
         return jsonData.getPersons();
     }
 
-    public ArrayList<MedicalRecord> getMedicalRecords(){
+    public ArrayList<MedicalRecord> getMedicalRecords() {
         return jsonData.getMedicalRecords();
     }
 
-    public ArrayList<FireStation> getFireStations(){
+    public ArrayList<FireStation> getFireStations() {
         return jsonData.getFireStations();
     }
 }

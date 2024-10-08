@@ -25,7 +25,7 @@ public class FireStationController {
 
     @PutMapping
     public ResponseEntity<String> addFireStation(@RequestBody FireStation firestation) {
-        logger.info("PUT Request /firestation {}", firestation.toString());
+        logger.info("PUT Request /firestation : %s".formatted(firestation.toString()));
         try {
             fireStationService.addFireStation(firestation);
             logger.info("PUT Request completed successfully.");
@@ -39,7 +39,7 @@ public class FireStationController {
 
     @DeleteMapping
     public ResponseEntity<String> deleteFireStation(@RequestBody FireStation firestation) {
-        logger.info("DELETE Request /firestation {}", firestation.toString());
+        logger.info("DELETE Request /firestation : %s".formatted(firestation.toString()));
         try {
             fireStationService.deleteFireStation(firestation);
             logger.info("DELETE Request completed successfully.");
@@ -53,7 +53,7 @@ public class FireStationController {
 
     @PostMapping
     public ResponseEntity<String> updateFireStation(@RequestBody FireStation firestation) {
-        logger.info("POST Request /firestation {}", firestation);
+        logger.info("POST Request /firestation : %s".formatted(firestation));
         try {
             fireStationService.updateFireStation(firestation);
             logger.info("POST Request completed successfully.");
