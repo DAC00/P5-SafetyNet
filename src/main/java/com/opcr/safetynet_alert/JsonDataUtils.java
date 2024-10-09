@@ -5,10 +5,10 @@ import com.opcr.safetynet_alert.model.FireStation;
 import com.opcr.safetynet_alert.model.JsonData;
 import com.opcr.safetynet_alert.model.MedicalRecord;
 import com.opcr.safetynet_alert.model.Person;
+import jakarta.annotation.PostConstruct;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -18,15 +18,16 @@ import java.util.ArrayList;
 @Component
 public class JsonDataUtils {
 
-    private static final Logger logger = LogManager.getLogger(JsonDataUtils.class);
+    @Value("${json.filepath}")
     private String filePath;
+
+    private static final Logger logger = LogManager.getLogger(JsonDataUtils.class);
     private JsonData jsonData;
 
-    @Autowired
-    public JsonDataUtils(Environment environment) {
-        this.filePath = environment.getProperty("json.filepath");
-        this.jsonData = null;
+    @PostConstruct
+    public void init() {
 
+        this.jsonData = null;
         getDataFromJSON();
 
         logger.info("File : %s.".formatted(filePath));
