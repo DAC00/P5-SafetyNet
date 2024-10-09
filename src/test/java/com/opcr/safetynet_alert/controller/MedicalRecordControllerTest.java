@@ -119,11 +119,12 @@ public class MedicalRecordControllerTest {
                 .andExpect(content().string("MedicalRecord updated."));
 
         jsonDataUtils.getDataFromJSON();
-        Optional<MedicalRecord> medicalRecordFromData = jsonDataUtils.getMedicalRecords().stream().filter(mr -> mr.getLastName().equals(medicalRecordUpdated.getLastName())
+        Optional<MedicalRecord> medicalRecordFromDataOpt = jsonDataUtils.getMedicalRecords().stream().filter(mr -> mr.getLastName().equals(medicalRecordUpdated.getLastName())
                 && mr.getFirstName().equals(medicalRecordUpdated.getFirstName())).findFirst();
-        medicalRecordFromData.ifPresent(mr -> Assertions.assertEquals(medicalRecordUpdated.getBirthdate(), mr.getBirthdate()));
-        medicalRecordFromData.ifPresent(mr -> Assertions.assertEquals(medicalRecordUpdated.getMedications(), mr.getMedications()));
-        medicalRecordFromData.ifPresent(mr -> Assertions.assertEquals(medicalRecordUpdated.getAllergies(), mr.getAllergies()));
+        Assertions.assertTrue(medicalRecordFromDataOpt.isPresent());
+        Assertions.assertEquals(medicalRecordUpdated.getBirthdate(), medicalRecordFromDataOpt.get().getBirthdate());
+        Assertions.assertEquals(medicalRecordUpdated.getMedications(), medicalRecordFromDataOpt.get().getMedications());
+        Assertions.assertEquals(medicalRecordUpdated.getAllergies(), medicalRecordFromDataOpt.get().getAllergies());
     }
 
     @Test

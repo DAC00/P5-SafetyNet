@@ -119,13 +119,14 @@ public class PersonControllerTest {
 
         jsonDataUtils.getDataFromJSON();
         Assertions.assertTrue(jsonDataUtils.getPersons().contains(personUpdated));
-        Optional<Person> personFromData = jsonDataUtils.getPersons().stream().filter(p -> p.getLastName().equals(personUpdated.getLastName())
+        Optional<Person> personFromDataOpt = jsonDataUtils.getPersons().stream().filter(p -> p.getLastName().equals(personUpdated.getLastName())
                 && p.getFirstName().equals(personUpdated.getFirstName())).findFirst();
-        personFromData.ifPresent(person -> Assertions.assertEquals(person.getAddress(), personUpdated.getAddress()));
-        personFromData.ifPresent(person -> Assertions.assertEquals(person.getCity(), personUpdated.getCity()));
-        personFromData.ifPresent(person -> Assertions.assertEquals(person.getZip(), personUpdated.getZip()));
-        personFromData.ifPresent(person -> Assertions.assertEquals(person.getPhone(), personUpdated.getPhone()));
-        personFromData.ifPresent(person -> Assertions.assertEquals(person.getEmail(), personUpdated.getEmail()));
+        Assertions.assertTrue(personFromDataOpt.isPresent());
+        Assertions.assertEquals(personFromDataOpt.get().getAddress(), personUpdated.getAddress());
+        Assertions.assertEquals(personFromDataOpt.get().getCity(), personUpdated.getCity());
+        Assertions.assertEquals(personFromDataOpt.get().getZip(), personUpdated.getZip());
+        Assertions.assertEquals(personFromDataOpt.get().getPhone(), personUpdated.getPhone());
+        Assertions.assertEquals(personFromDataOpt.get().getEmail(), personUpdated.getEmail());
     }
 
     @Test
