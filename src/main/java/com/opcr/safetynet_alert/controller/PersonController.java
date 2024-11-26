@@ -16,12 +16,9 @@ import org.springframework.web.bind.annotation.*;
 public class PersonController {
 
     private static final Logger logger = LogManager.getLogger(PersonController.class);
-    private final PersonService personService;
 
     @Autowired
-    public PersonController(PersonService personService) {
-        this.personService = personService;
-    }
+    private PersonService personService;
 
     @PutMapping
     public ResponseEntity<String> addPerson(@RequestBody Person person) {

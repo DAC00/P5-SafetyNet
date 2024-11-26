@@ -16,12 +16,9 @@ import org.springframework.web.bind.annotation.*;
 public class MedicalRecordController {
 
     private static final Logger logger = LogManager.getLogger(MedicalRecordController.class);
-    private final MedicalRecordService medicalRecordService;
 
     @Autowired
-    public MedicalRecordController(MedicalRecordService medicalRecordService) {
-        this.medicalRecordService = medicalRecordService;
-    }
+    private MedicalRecordService medicalRecordService;
 
     @PutMapping
     public ResponseEntity<String> addMedicalRecord(@RequestBody MedicalRecord medicalRecord) {
