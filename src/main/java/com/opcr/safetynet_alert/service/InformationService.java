@@ -1,12 +1,7 @@
 package com.opcr.safetynet_alert.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.opcr.safetynet_alert.JsonDataUtils;
-import com.opcr.safetynet_alert.model.FireStation;
-import com.opcr.safetynet_alert.model.MedicalRecord;
-import com.opcr.safetynet_alert.model.Person;
+import com.opcr.safetynet_alert.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,40 +24,34 @@ public class InformationService {
      * and a sum of child and adult.
      *
      * @param stationNumber the number of the station.
-     * @return an ObjectNode of the result could be empty.
+     * @return FireStationCoverage or null.
      **/
-    public ObjectNode findPersonsFromFireStationNumber(int stationNumber) {
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectNode responseJson = mapper.createObjectNode();
-        ArrayNode listPersonNode = mapper.createArrayNode();
-        int children = 0;
-        int adults = 0;
+    public FireStationCoverage findPersonsFromFireStationNumber(int stationNumber) {
+
+        int adultCount = 0;
+        int childCount = 0;
+        List<PersonAddressPhone> list = new ArrayList<>();
+
         for (FireStation f : jsonDataUtils.getFireStations().stream().filter(f -> f.getStation() == stationNumber).toList()) {
             for (Person p : jsonDataUtils.getPersons().stream().filter(p -> p.getAddress().equals(f.getAddress())).toList()) {
-                ObjectNode personNode = mapper.createObjectNode();
-                personNode.put("lastName", p.getLastName());
-                personNode.put("firstName", p.getFirstName());
-                personNode.put("address", p.getAddress());
-                personNode.put("phone", p.getPhone());
+
+                list.add(new PersonAddressPhone(p.getFirstName(), p.getLastName(), p.getAddress(), p.getPhone()));
+
                 for (MedicalRecord mr : jsonDataUtils.getMedicalRecords().stream().filter(mr -> mr.getFirstName().equals(p.getFirstName())
                         && mr.getLastName().equals(p.getLastName())).toList()) {
                     if (getAgeFromMedicalRecord(mr.getBirthdate()) >= 18) {
-                        adults++;
+                        adultCount++;
                     } else {
-                        children++;
+                        childCount++;
                     }
                 }
-                listPersonNode.add(personNode);
             }
         }
-
-        if (!listPersonNode.isEmpty()) {
-            responseJson.put("station", stationNumber);
-            responseJson.put("adults", adults);
-            responseJson.put("children", children);
-            responseJson.putArray("persons").addAll(listPersonNode);
+        if (list.isEmpty()) {
+            return null;
+        } else {
+            return new FireStationCoverage(adultCount, childCount, list);
         }
-        return responseJson;
     }
 
     /**
@@ -71,35 +60,28 @@ public class InformationService {
      * And the lastName and firstName of the other people living at the same address.
      *
      * @param address the address to search.
-     * @return an ObjectNode of the result, could be empty.
+     * @return a ChildFromAddress object as a result or null.
      **/
-    public ObjectNode findChildFromAddress(String address) {
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectNode responseJson = mapper.createObjectNode();
-        ArrayNode listChildren = mapper.createArrayNode();
-        ArrayNode listAdults = mapper.createArrayNode();
+    public ChildFromAddress findChildFromAddress(String address) {
+        List<Child> childList = new ArrayList<>();
+        List<PersonSimple> adultList = new ArrayList<>();
+
         for (Person p : jsonDataUtils.getPersons().stream().filter(p -> p.getAddress().equals(address)).toList()) {
-            ObjectNode personNode = mapper.createObjectNode();
             MedicalRecord medRecFind = jsonDataUtils.getMedicalRecords().stream().filter(medicalRecord -> medicalRecord.getLastName().equals(p.getLastName())
                     && medicalRecord.getFirstName().equals(p.getFirstName())).findFirst().orElse(null);
             if (medRecFind != null) {
                 if (getAgeFromMedicalRecord(medRecFind.getBirthdate()) < 18) {
-                    personNode.put("lastName", p.getLastName());
-                    personNode.put("firstName", p.getFirstName());
-                    personNode.put("age", getAgeFromMedicalRecord(medRecFind.getBirthdate()));
-                    listChildren.add(personNode);
+                    childList.add(new Child(p.getFirstName(), p.getLastName(), getAgeFromMedicalRecord(medRecFind.getBirthdate())));
                 } else {
-                    personNode.put("lastName", p.getLastName());
-                    personNode.put("firstName", p.getFirstName());
-                    listAdults.add(personNode);
+                    adultList.add(new PersonSimple(p.getFirstName(), p.getLastName()));
                 }
             }
         }
-        if (!listChildren.isEmpty()) {
-            responseJson.putArray("children").addAll(listChildren);
-            responseJson.putArray("adults").addAll(listAdults);
+        if (childList.isEmpty()) {
+            return null;
+        } else {
+            return new ChildFromAddress(childList, adultList);
         }
-        return responseJson;
     }
 
     /**
@@ -108,7 +90,7 @@ public class InformationService {
      * @param fireStationNumber the FireStation number.
      * @return a List of phone number.
      **/
-    public ArrayList<String> findPhoneNumberOfPersonFromFireStation(int fireStationNumber) {
+    public List<String> findPhoneNumberOfPersonFromFireStation(int fireStationNumber) {
         ArrayList<String> phoneNumbers = new ArrayList<>();
         for (FireStation f : jsonDataUtils.getFireStations().stream().filter(f -> f.getStation() == fireStationNumber).toList()) {
             for (Person p : jsonDataUtils.getPersons().stream().filter(p -> p.getAddress().equals(f.getAddress())).toList()) {
@@ -123,16 +105,12 @@ public class InformationService {
      * The return must contain : lastName, firstName, phone number, age and the MedicalRecord for each person.
      *
      * @param address the address to search.
-     * @return an objectNode of the result, could be empty.
+     * @return HouseAndFireStationNumberFromAddress or null.
      **/
-    public ObjectNode findPersonAndFireStationNumberFromAddress(String address) {
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectNode responseJson = mapper.createObjectNode();
-        ArrayNode listPersonNode = mapper.createArrayNode();
-
+    public HouseAndFireStationNumberFromAddress findPersonAndFireStationNumberFromAddress(String address) {
         Optional<FireStation> fireStation = jsonDataUtils.getFireStations().stream().filter(f -> f.getAddress().equals(address)).findFirst();
-
         List<Person> personArrayList = jsonDataUtils.getPersons().stream().filter(p -> p.getAddress().equals(address)).toList();
+        List<PersonRecordPhone> listPersonRecordPhone = new ArrayList<>();
 
         if (!personArrayList.isEmpty()) {
             for (Person p : personArrayList) {
@@ -140,30 +118,23 @@ public class InformationService {
                 MedicalRecord medRecFind = jsonDataUtils.getMedicalRecords().stream().filter(medicalRecord -> medicalRecord.getLastName().equals(p.getLastName())
                         && medicalRecord.getFirstName().equals(p.getFirstName())).findFirst().orElse(null);
 
-                ObjectNode personNode = mapper.createObjectNode();
-                personNode.put("lastName", p.getLastName());
-                personNode.put("firstName", p.getFirstName());
-                personNode.put("phone", p.getPhone());
+                List<String> listMedications = new ArrayList<>();
+                List<String> listAllergies = new ArrayList<>();
+                int age = 0;
 
                 if (medRecFind != null) {
-                    personNode.put("age", getAgeFromMedicalRecord(medRecFind.getBirthdate()));
-                    ArrayNode listMedications = mapper.createArrayNode();
-                    ArrayNode listAllergies = mapper.createArrayNode();
-                    for (String med : medRecFind.getMedications()) {
-                        listMedications.add(med);
-                    }
-                    for (String allergies : medRecFind.getAllergies()) {
-                        listAllergies.add(allergies);
-                    }
-                    personNode.putArray("medications").addAll(listMedications);
-                    personNode.putArray("allergies").addAll(listAllergies);
+                    age = getAgeFromMedicalRecord(medRecFind.getBirthdate());
+                    listMedications.addAll(medRecFind.getMedications());
+                    listAllergies.addAll(medRecFind.getAllergies());
                 }
-                listPersonNode.add(personNode);
+                listPersonRecordPhone.add(new PersonRecordPhone(p.getFirstName(), p.getLastName(), age, p.getPhone(), listAllergies, listMedications));
             }
-            responseJson.put("stations", fireStation.map(FireStation::getStation).orElse(0));
-            responseJson.putArray("persons").addAll(listPersonNode);
         }
-        return responseJson;
+        if (listPersonRecordPhone.isEmpty()) {
+            return null;
+        } else {
+            return new HouseAndFireStationNumberFromAddress(fireStation.map(FireStation::getStation).orElse(0), listPersonRecordPhone);
+        }
     }
 
     /**
@@ -171,16 +142,16 @@ public class InformationService {
      * The return must contain : lastName, firstName, phone number, age and the MedicalRecord for each person.
      *
      * @param stationNumbers the List stationNumber.
-     * @return an objectNode of the result, could be empty.
+     * @return a list of HouseFromFireStationNumber, could be empty.
      **/
-    public ArrayNode findPersonFromFireStationNumber(List<Integer> stationNumbers) {
-        ObjectMapper mapper = new ObjectMapper();
-        ArrayNode responseJson = mapper.createArrayNode();
+    public List<HouseFromFireStationNumber> findPersonFromFireStationNumber(List<Integer> stationNumbers) {
+
+        List<HouseFromFireStationNumber> houseList = new ArrayList<>();
+
         for (FireStation fireStation : jsonDataUtils.getFireStations().stream().filter(fireStation -> stationNumbers.contains(fireStation.getStation())).toList()) {
-            ObjectNode addressNode = mapper.createObjectNode();
-            ArrayNode listPersonNode = mapper.createArrayNode();
 
             List<Person> personArrayList = jsonDataUtils.getPersons().stream().filter(person -> fireStation.getAddress().equals(person.getAddress())).toList();
+            List<PersonRecordPhone> listPersonRecordPhone = new ArrayList<>();
 
             if (!personArrayList.isEmpty()) {
                 for (Person person : personArrayList) {
@@ -188,31 +159,21 @@ public class InformationService {
                     MedicalRecord medRecFind = jsonDataUtils.getMedicalRecords().stream().filter(medicalRecord -> medicalRecord.getLastName().equals(person.getLastName())
                             && medicalRecord.getFirstName().equals(person.getFirstName())).findFirst().orElse(null);
 
-                    ObjectNode personNode = mapper.createObjectNode();
-                    personNode.put("lastName", person.getLastName());
-                    personNode.put("firstName", person.getFirstName());
-                    personNode.put("phone", person.getPhone());
+                    List<String> listMedications = new ArrayList<>();
+                    List<String> listAllergies = new ArrayList<>();
+                    int age = 0;
 
                     if (medRecFind != null) {
-                        personNode.put("age", getAgeFromMedicalRecord(medRecFind.getBirthdate()));
-                        ArrayNode listMedications = mapper.createArrayNode();
-                        ArrayNode listAllergies = mapper.createArrayNode();
-                        for (String med : medRecFind.getMedications()) {
-                            listMedications.add(med);
-                        }
-                        for (String allergies : medRecFind.getAllergies()) {
-                            listAllergies.add(allergies);
-                        }
-                        personNode.putArray("medications").addAll(listMedications);
-                        personNode.putArray("allergies").addAll(listAllergies);
+                        age = getAgeFromMedicalRecord(medRecFind.getBirthdate());
+                        listMedications.addAll(medRecFind.getMedications());
+                        listAllergies.addAll(medRecFind.getAllergies());
                     }
-                    listPersonNode.add(personNode);
+                    listPersonRecordPhone.add(new PersonRecordPhone(person.getFirstName(), person.getLastName(), age, person.getPhone(), listAllergies, listMedications));
                 }
-                addressNode.putArray(fireStation.getAddress()).addAll(listPersonNode);
-                responseJson.add(addressNode);
+                houseList.add(new HouseFromFireStationNumber(fireStation.getAddress(), listPersonRecordPhone));
             }
         }
-        return responseJson;
+        return houseList;
     }
 
     /**
@@ -220,12 +181,11 @@ public class InformationService {
      * The return must contain : lastName, firstName, email, age and the MedicalRecord for each person.
      *
      * @param lastName the lastName to search.
-     * @return an objectNode of the result, could be empty.
+     * @return a list of PersonRecordMail, could be empty.
      **/
-    public ObjectNode findPersonFromLastName(String lastName) {
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectNode responseJson = mapper.createObjectNode();
-        ArrayNode listPersonNode = mapper.createArrayNode();
+    public List<PersonRecordMail> findPersonFromLastName(String lastName) {
+
+        List<PersonRecordMail> listAdultRecordMail = new ArrayList<>();
 
         List<Person> personArrayList = jsonDataUtils.getPersons().stream().filter(p -> p.getLastName().equals(lastName)).toList();
 
@@ -235,29 +195,19 @@ public class InformationService {
                 MedicalRecord medRecFind = jsonDataUtils.getMedicalRecords().stream().filter(medicalRecord -> medicalRecord.getLastName().equals(p.getLastName())
                         && medicalRecord.getFirstName().equals(p.getFirstName())).findFirst().orElse(null);
 
-                ObjectNode personNode = mapper.createObjectNode();
-                personNode.put("lastName", p.getLastName());
-                personNode.put("firstName", p.getFirstName());
-                personNode.put("email", p.getEmail());
+                List<String> listAllergies = new ArrayList<>();
+                List<String> listMedications = new ArrayList<>();
+                int age = 0;
 
                 if (medRecFind != null) {
-                    personNode.put("age", getAgeFromMedicalRecord(medRecFind.getBirthdate()));
-                    ArrayNode listMedications = mapper.createArrayNode();
-                    ArrayNode listAllergies = mapper.createArrayNode();
-                    for (String med : medRecFind.getMedications()) {
-                        listMedications.add(med);
-                    }
-                    for (String allergies : medRecFind.getAllergies()) {
-                        listAllergies.add(allergies);
-                    }
-                    personNode.putArray("medications").addAll(listMedications);
-                    personNode.putArray("allergies").addAll(listAllergies);
+                    age = getAgeFromMedicalRecord(medRecFind.getBirthdate());
+                    listMedications.addAll(medRecFind.getMedications());
+                    listAllergies.addAll(medRecFind.getAllergies());
                 }
-                listPersonNode.add(personNode);
+                listAdultRecordMail.add(new PersonRecordMail(p.getFirstName(), p.getLastName(), p.getAddress(), age, listAllergies, listMedications, p.getEmail()));
             }
-            responseJson.putArray("persons").addAll(listPersonNode);
         }
-        return responseJson;
+        return listAdultRecordMail;
     }
 
     /**

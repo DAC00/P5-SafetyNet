@@ -10,8 +10,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -25,18 +24,17 @@ public class InformationControllerTest {
         this.mockMvc.perform(get("/firestation?stationNumber=1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.station").value("1"))
-                .andExpect(jsonPath("$.adults").value("1"))
-                .andExpect(jsonPath("$.children").value("1"))
-                .andExpect(jsonPath("$.persons", hasSize(2)))
-                .andExpect(jsonPath("$.persons[0].lastName", is("Test")))
-                .andExpect(jsonPath("$.persons[0].firstName", is("One")))
-                .andExpect(jsonPath("$.persons[0].address", is("11 Test St")))
-                .andExpect(jsonPath("$.persons[0].phone", is("111-111-1111")))
-                .andExpect(jsonPath("$.persons[1].lastName", is("Test")))
-                .andExpect(jsonPath("$.persons[1].firstName", is("Two")))
-                .andExpect(jsonPath("$.persons[1].address", is("11 Test St")))
-                .andExpect(jsonPath("$.persons[1].phone", is("222-222-2222")));
+                .andExpect(jsonPath("$.adultCount").value("1"))
+                .andExpect(jsonPath("$.childCount").value("1"))
+                .andExpect(jsonPath("$.listPersonAddressPhoneList", hasSize(2)))
+                .andExpect(jsonPath("$.listPersonAddressPhoneList[0].firstName", is("One")))
+                .andExpect(jsonPath("$.listPersonAddressPhoneList[0].lastName", is("Test")))
+                .andExpect(jsonPath("$.listPersonAddressPhoneList[0].address", is("11 Test St")))
+                .andExpect(jsonPath("$.listPersonAddressPhoneList[0].phone", is("111-111-1111")))
+                .andExpect(jsonPath("$.listPersonAddressPhoneList[1].firstName", is("Two")))
+                .andExpect(jsonPath("$.listPersonAddressPhoneList[1].lastName", is("Test")))
+                .andExpect(jsonPath("$.listPersonAddressPhoneList[1].address", is("11 Test St")))
+                .andExpect(jsonPath("$.listPersonAddressPhoneList[1].phone", is("222-222-2222")));
     }
 
     @Test
@@ -44,7 +42,7 @@ public class InformationControllerTest {
         this.mockMvc.perform(get("/firestation?stationNumber=99")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isEmpty());
+                .andExpect(content().string(""));
     }
 
     @Test
@@ -66,7 +64,7 @@ public class InformationControllerTest {
         this.mockMvc.perform(get("/childAlert?address=no")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isEmpty());
+                .andExpect(content().string(""));
     }
 
     @Test
@@ -92,10 +90,10 @@ public class InformationControllerTest {
         this.mockMvc.perform(get("/fire?address=22 Test St")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.stations", is(2)))
+                .andExpect(jsonPath("$.fireStationNumber", is(2)))
                 .andExpect(jsonPath("$.persons", hasSize(1)))
-                .andExpect(jsonPath("$.persons[0].lastName", is("LeTest")))
                 .andExpect(jsonPath("$.persons[0].firstName", is("Three")))
+                .andExpect(jsonPath("$.persons[0].lastName", is("LeTest")))
                 .andExpect(jsonPath("$.persons[0].phone", is("333-333-3333")))
                 .andExpect(jsonPath("$.persons[0].age", is(91)))
                 .andExpect(jsonPath("$.persons[0].medications", hasSize(0)))
@@ -108,7 +106,7 @@ public class InformationControllerTest {
         this.mockMvc.perform(get("/fire?address=no")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isEmpty());
+                .andExpect(content().string(""));
     }
 
     @Test
@@ -117,19 +115,19 @@ public class InformationControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0]['22 Test St']", hasSize(1)))
-                .andExpect(jsonPath("$[0]['22 Test St'][0].lastName", is("LeTest")))
-                .andExpect(jsonPath("$[0]['22 Test St'][0].firstName", is("Three")))
-                .andExpect(jsonPath("$[0]['22 Test St'][0].age", is(91)))
-                .andExpect(jsonPath("$[0]['22 Test St'][0].medications", hasSize(0)))
-                .andExpect(jsonPath("$[0]['22 Test St'][0].allergies", hasSize(1)))
-                .andExpect(jsonPath("$[0]['22 Test St'][0].allergies[0]", is("peanut")))
-                .andExpect(jsonPath("$[1]['33 Test St']", hasSize(1)))
-                .andExpect(jsonPath("$[1]['33 Test St'][0].lastName", is("Example")))
-                .andExpect(jsonPath("$[1]['33 Test St'][0].firstName", is("Four")))
-                .andExpect(jsonPath("$[1]['33 Test St'][0].age", is(80)))
-                .andExpect(jsonPath("$[1]['33 Test St'][0].medications", hasSize(0)))
-                .andExpect(jsonPath("$[1]['33 Test St'][0].allergies", hasSize(0)));
+                .andExpect(jsonPath("$[0].address", is("22 Test St")))
+                .andExpect(jsonPath("$[0].persons[0].lastName", is("LeTest")))
+                .andExpect(jsonPath("$[0].persons[0].firstName", is("Three")))
+                .andExpect(jsonPath("$[0].persons[0].age", is(91)))
+                .andExpect(jsonPath("$[0].persons[0].medications", hasSize(0)))
+                .andExpect(jsonPath("$[0].persons[0].allergies", hasSize(1)))
+                .andExpect(jsonPath("$[0].persons[0].allergies[0]", is("peanut")))
+                .andExpect(jsonPath("$[1].address", is("33 Test St")))
+                .andExpect(jsonPath("$[1].persons[0].lastName", is("Example")))
+                .andExpect(jsonPath("$[1].persons[0].firstName", is("Four")))
+                .andExpect(jsonPath("$[1].persons[0].age", is(80)))
+                .andExpect(jsonPath("$[1].persons[0].medications", hasSize(0)))
+                .andExpect(jsonPath("$[1].persons[0].allergies", hasSize(0)));
     }
 
     @Test
@@ -145,19 +143,19 @@ public class InformationControllerTest {
         this.mockMvc.perform(get("/personInfo?lastName=Test")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.persons", hasSize(2)))
-                .andExpect(jsonPath("$.persons[0].lastName", is("Test")))
-                .andExpect(jsonPath("$.persons[0].firstName", is("One")))
-                .andExpect(jsonPath("$.persons[0].email", is("one@email.com")))
-                .andExpect(jsonPath("$.persons[0].age", is(43)))
-                .andExpect(jsonPath("$.persons[0].medications", hasSize(2)))
-                .andExpect(jsonPath("$.persons[0].allergies", hasSize(1)))
-                .andExpect(jsonPath("$.persons[1].lastName", is("Test")))
-                .andExpect(jsonPath("$.persons[1].firstName", is("Two")))
-                .andExpect(jsonPath("$.persons[1].email", is("two@email.com")))
-                .andExpect(jsonPath("$.persons[1].age", is(4)))
-                .andExpect(jsonPath("$.persons[1].medications", hasSize(3)))
-                .andExpect(jsonPath("$.persons[1].allergies", hasSize(0)));
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].lastName", is("Test")))
+                .andExpect(jsonPath("$[0].firstName", is("One")))
+                .andExpect(jsonPath("$[0].mail", is("one@email.com")))
+                .andExpect(jsonPath("$[0].age", is(43)))
+                .andExpect(jsonPath("$[0].medications", hasSize(2)))
+                .andExpect(jsonPath("$[0].allergies", hasSize(1)))
+                .andExpect(jsonPath("$[1].lastName", is("Test")))
+                .andExpect(jsonPath("$[1].firstName", is("Two")))
+                .andExpect(jsonPath("$[1].mail", is("two@email.com")))
+                .andExpect(jsonPath("$[1].age", is(4)))
+                .andExpect(jsonPath("$[1].medications", hasSize(3)))
+                .andExpect(jsonPath("$[1].allergies", hasSize(0)));
     }
 
     @Test
